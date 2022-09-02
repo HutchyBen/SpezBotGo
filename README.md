@@ -14,6 +14,10 @@
 - /skip
 - /queue
 - /echo
+- /pause
+- /resume
+- /seek
+- /shuffle
 
 ## Todo
 - [ ] Shortcuts to playlists
