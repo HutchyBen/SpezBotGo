@@ -24,11 +24,15 @@ func init() {
 			},
 		},
 		Run: func(b *bot.Bot, evt *discordgo.InteractionCreate) *discordgo.InteractionResponseData {
-			
-
+			err := b.Client.InteractionRespond(evt.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+			})
+			if err != nil {
+				fmt.Println(err)
+			}
 			songs, vi, isURL, err := PlayStart(b, evt)
 			if err != nil {
-				return &discordgo.InteractionResponseData{
+				b.Client.FollowupMessageCreate(evt.Interaction, false, &discordgo.WebhookParams{
 					Embeds: []*discordgo.MessageEmbed{
 						{
 							Title:       "Error",
@@ -36,7 +40,8 @@ func init() {
 							Color:       0xff0000,
 						},
 					},
-				}
+				})
+				return nil
 			}
 			embedTitle := ""
 
@@ -57,14 +62,15 @@ func init() {
 					if len(vi.Queues[0].Tracks) > 0 {
 						err = vi.Guild.PlayTrack(*vi.Queues[0].Pop())
 					} else {
-						return &discordgo.InteractionResponseData{
+						b.Client.FollowupMessageCreate(evt.Interaction, false, &discordgo.WebhookParams{
 							Embeds: []*discordgo.MessageEmbed{
 								{
-									Title: "Could not play song",
+									Title: "Error could not play any songs",
 									Color: 0xff0000,
 								},
 							},
-						}
+						})
+						return nil
 					}
 				}
 				vi.NowPlaying = &bot.NowPlaying{
@@ -74,25 +80,26 @@ func init() {
 				if len(vi.Queues[0].Tracks) == 0 {
 					vi.Queues = make([]bot.Queue, 0)
 				}
-				return &discordgo.InteractionResponseData{
+				b.Client.FollowupMessageCreate(evt.Interaction, false, &discordgo.WebhookParams{
 					Embeds: []*discordgo.MessageEmbed{
 						{
 							Title: "Starting voice session",
 							Color: 0x00ff00,
 						},
 					},
-				}
+				})
+				return nil
 			}
 
-			return &discordgo.InteractionResponseData{
+			b.Client.FollowupMessageCreate(evt.Interaction, false, &discordgo.WebhookParams{
 				Embeds: []*discordgo.MessageEmbed{
 					{
 						Title: embedTitle,
 						Color: 0x00ff00,
 					},
 				},
-			}
-
+			})
+			return nil
 		},
 	})
 }

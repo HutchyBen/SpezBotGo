@@ -1,4 +1,4 @@
 config.json
 spezbot
-db/*
+*.db
 models/*

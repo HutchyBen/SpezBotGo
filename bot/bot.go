@@ -10,7 +10,7 @@ import (
 	"github.com/gompus/snowflake"
 	"github.com/lukasl-dev/waterlink/v2"
 	"github.com/lukasl-dev/waterlink/v2/event"
-	"github.com/xujiajun/nutsdb"
+	"go.etcd.io/bbolt"
 )
 
 type Bot struct {
@@ -20,7 +20,7 @@ type Bot struct {
 	LLClient       *waterlink.Client
 	CH             *CommandHandler
 	VoiceInstances map[string]*VoiceInstance
-	DB             *nutsdb.DB
+	DB             *bbolt.DB
 	Markov         map[string]*Markov
 }
 
@@ -63,10 +63,7 @@ func NewBot(configPath string) (*Bot, error) {
 
 	bot.VoiceInstances = make(map[string]*VoiceInstance)
 
-	bot.DB, err = nutsdb.Open(
-		nutsdb.DefaultOptions,
-		nutsdb.WithDir("db"),
-	)
+	bot.DB, err = bbolt.Open("spez.db", 0600, nil)
 
 	bot.Markov = make(map[string]*Markov)
 	bot.LoadMarkovChainsFromDir("models")
