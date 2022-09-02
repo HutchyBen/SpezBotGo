@@ -2,6 +2,9 @@ package bot
 
 import (
 	"fmt"
+	"math/rand"
+	"os"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gompus/snowflake"
@@ -18,6 +21,7 @@ type Bot struct {
 	CH             *CommandHandler
 	VoiceInstances map[string]*VoiceInstance
 	DB             *nutsdb.DB
+	Markov         map[string]*Markov
 }
 
 func NewBot(configPath string) (*Bot, error) {
@@ -27,6 +31,7 @@ func NewBot(configPath string) (*Bot, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Load discord client
 	bot.Client, err = discordgo.New("Bot " + bot.Config.DToken)
 	if err != nil {
 		return nil, err
@@ -35,6 +40,8 @@ func NewBot(configPath string) (*Bot, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Load waterlink stuff
 	creds := waterlink.Credentials{
 		Authorization: bot.Config.LLPassword,
 		UserID:        snowflake.MustParse(bot.Client.State.User.ID),
@@ -49,16 +56,51 @@ func NewBot(configPath string) (*Bot, error) {
 	if err != nil {
 		return nil, err
 	}
-	bot.CH = NewCH()
-
-	bot.Client.AddHandler(bot.HandleInteraction)
 	bot.Client.AddHandler(bot.VoiceServerUpdate)
+
+	bot.CH = NewCH()
+	bot.Client.AddHandler(bot.HandleInteraction)
+
 	bot.VoiceInstances = make(map[string]*VoiceInstance)
+
 	bot.DB, err = nutsdb.Open(
 		nutsdb.DefaultOptions,
 		nutsdb.WithDir("db"),
 	)
+
+	bot.Markov = make(map[string]*Markov)
+	bot.LoadMarkovChainsFromDir("models")
+	bot.Client.AddHandler(bot.MarkovMessage)
 	return &bot, err
+}
+
+func (b *Bot) LoadMarkovChainsFromDir(dir string) error {
+	fs, err := os.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+	for _, f := range fs {
+		mk := NewMarkov(f.Name())
+		b.Markov[strings.Split(f.Name(), ".")[0]] = mk
+	}
+	return nil
+}
+
+func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) {
+	if evt.Author.ID == s.State.User.ID {
+		return
+	}
+	mk, ok := b.Markov[evt.GuildID]
+	if !ok {
+		b.Markov[evt.GuildID] = NewMarkov(evt.GuildID)
+	}
+	if strings.TrimSpace(evt.Content) != "" {
+		mk.Add(strings.TrimSpace(evt.Content))
+	}
+
+	if rand.Intn(8) == 1 || strings.Contains(evt.Content, "spez") || strings.Contains(evt.Content, fmt.Sprintf("<@%s>", s.State.User.ID)) {
+		s.ChannelMessageSend(evt.ChannelID, mk.Generate())
+	}
 }
 
 func (b *Bot) VoiceServerUpdate(s *discordgo.Session, evt *discordgo.VoiceServerUpdate) {

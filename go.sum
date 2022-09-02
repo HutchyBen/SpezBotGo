@@ -13,6 +13,9 @@ github.com/gorilla/websocket v1.5.0 h1:PPwGk2jz7EePpoHN/+ClbZu8SPxiqlu12wZP/3sWm
 github.com/gorilla/websocket v1.5.0/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/lukasl-dev/waterlink/v2 v2.0.1 h1:Z6+K4RUH6GaOm6JH5/WTvapJniIX8OGA1XqSW2AaCJA=
 github.com/lukasl-dev/waterlink/v2 v2.0.1/go.mod h1:57q0Eao4Mpk/ZvBHnnAFUGG4IQTXCtxsd/F2SDB7MHA=
+github.com/mb-14/gomarkov v0.0.0-20210216094942-a5b484cc0243 h1:F0IAcxxFNzC8/HOxI5Q2hpsWAoGdy+lGMjoVyrcMeSw=
+github.com/mb-14/gomarkov v0.0.0-20210216094942-a5b484cc0243/go.mod h1:5F3Y03oxWIyMq3Wa4AxU544RYnXNZwHBfqpDpdLibBY=
+github.com/montanaflynn/stats v0.6.3/go.mod h1:wL8QJuTMNUDYhXwkmfOly8iTdp5TEcJFWZD2D7SIkUc=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

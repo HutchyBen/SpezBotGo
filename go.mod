@@ -17,6 +17,7 @@ require (
 
 require (
 	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/mb-14/gomarkov v0.0.0-20210216094942-a5b484cc0243
 	github.com/xujiajun/nutsdb v0.10.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/sys v0.0.0-20220405210540-1e041c57c461 // indirect
