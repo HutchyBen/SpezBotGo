@@ -21,5 +21,5 @@
 - [x] Shuffle
 - [ ] Lavalink filters
 - [ ] Lavalink resuming (maybe)
-- [ ] Pausing
+- [x] Pausing
 - [ ] Seek command

@@ -27,7 +27,7 @@ func init() {
 			vi, ok := b.VoiceInstances[evt.GuildID]
 			if !ok {
 				return &discordgo.InteractionResponseData{
-					Content: "The bot is not in a voice channel",
+					Content: "The bot is not connected to a voice chat",
 				}
 			}
 			var skipAmount int64 = 1

@@ -1,8 +1,6 @@
 package bot
 
 import (
-	"fmt"
-
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -37,7 +35,10 @@ func (c *CommandHandler) Register(s *discordgo.Session) {
 	for _, cmd := range c.Commands {
 		commands = append(commands, &cmd.ApplicationCommand)
 	}
-	s.ApplicationCommandBulkOverwrite(s.State.User.ID, "", commands)
+	_, err := s.ApplicationCommandBulkOverwrite(s.State.User.ID, "", commands)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (b *Bot) HandleInteraction(s *discordgo.Session, evt *discordgo.InteractionCreate) {
@@ -57,13 +58,11 @@ func (b *Bot) HandleInteraction(s *discordgo.Session, evt *discordgo.Interaction
 
 		// asume response is handled if is nil
 
-		err := s.InteractionRespond(evt.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(evt.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: cmd.Run(b, evt),
 		})
-		if err != nil {
-			fmt.Println(err)
-		}
+
 	case discordgo.InteractionMessageComponent:
 		b.CH.Events[evt.GuildID] <- evt
 	}
