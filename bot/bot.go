@@ -7,6 +7,7 @@ import (
 	"github.com/gompus/snowflake"
 	"github.com/lukasl-dev/waterlink/v2"
 	"github.com/lukasl-dev/waterlink/v2/event"
+	"github.com/xujiajun/nutsdb"
 )
 
 type Bot struct {
@@ -16,6 +17,7 @@ type Bot struct {
 	LLClient       *waterlink.Client
 	CH             *CommandHandler
 	VoiceInstances map[string]*VoiceInstance
+	DB             *nutsdb.DB
 }
 
 func NewBot(configPath string) (*Bot, error) {
@@ -52,7 +54,11 @@ func NewBot(configPath string) (*Bot, error) {
 	bot.Client.AddHandler(bot.HandleInteraction)
 	bot.Client.AddHandler(bot.VoiceServerUpdate)
 	bot.VoiceInstances = make(map[string]*VoiceInstance)
-	return &bot, nil
+	bot.DB, err = nutsdb.Open(
+		nutsdb.DefaultOptions,
+		nutsdb.WithDir("db"),
+	)
+	return &bot, err
 }
 
 func (b *Bot) VoiceServerUpdate(s *discordgo.Session, evt *discordgo.VoiceServerUpdate) {

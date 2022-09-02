@@ -3,6 +3,7 @@ package bot
 import (
 	"fmt"
 	"net/url"
+	"sync"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gompus/snowflake"
@@ -74,6 +75,7 @@ func (vi *VoiceInstance) QueueSong(member *discordgo.Member, song track.Track) {
 	vi.Queues = append(vi.Queues, Queue{
 		Member: member,
 		Tracks: []track.Track{song},
+		mu:     &sync.Mutex{},
 	})
 }
 

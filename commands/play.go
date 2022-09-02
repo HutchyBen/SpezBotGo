@@ -18,12 +18,14 @@ func init() {
 				{
 					Type:        discordgo.ApplicationCommandOptionString,
 					Name:        "query",
-					Description: "The query to search for",
+					Description: "The query to find song/playlist",
 					Required:    true,
 				},
 			},
 		},
 		Run: func(b *bot.Bot, evt *discordgo.InteractionCreate) *discordgo.InteractionResponseData {
+			
+
 			songs, vi, isURL, err := PlayStart(b, evt)
 			if err != nil {
 				return &discordgo.InteractionResponseData{

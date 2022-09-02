@@ -21,14 +21,23 @@ func PlayStart(b *bot.Bot, evt *discordgo.InteractionCreate) (songs *track.LoadR
 		b.CreateVoiceInstance(evt.GuildID, evt.Member.User.ID, state.ChannelID, evt.ChannelID)
 		vi = b.VoiceInstances[evt.GuildID]
 	}
-	songs, err = vi.GetSongs(evt.ApplicationCommandData().Options[0].StringValue())
+
+	searchTerm := ""
+	playlist, err := b.GetPlaylist(evt.ApplicationCommandData().Options[0].StringValue())
+	if err != nil {
+		searchTerm = evt.ApplicationCommandData().Options[0].StringValue()
+	} else {
+		searchTerm = playlist
+	}
+
+	songs, err = vi.GetSongs(searchTerm)
 	if err != nil {
 		return nil, nil, false, errors.New("error getting songs")
 	}
 	if len(songs.Tracks) == 0 {
 		return nil, nil, false, errors.New("no songs found")
 	}
-	_, uri := url.ParseRequestURI(evt.ApplicationCommandData().Options[0].StringValue())
+	_, uri := url.ParseRequestURI(searchTerm)
 	isURL = uri == nil
 	// If no song is playing play the song
 	return
