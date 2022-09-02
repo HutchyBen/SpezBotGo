@@ -11,7 +11,7 @@ import (
 type Queue struct {
 	Member *discordgo.Member
 	Tracks []track.Track
-	mu     sync.Mutex
+	mu     *sync.Mutex
 }
 
 func (q *Queue) Add(track track.Track) {

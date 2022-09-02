@@ -71,14 +71,13 @@ func (b *Bot) WaterLinkEventHandler(evt interface{}) {
 			return
 		}
 		vi.TrackEnd(e)
-		break
+
 	case event.TrackStart:
 		vi, ok := b.VoiceInstances[e.GuildID.String()]
 		if !ok {
 			return
 		}
 		vi.TrackStart(e)
-		break
-	}
 
+	}
 }

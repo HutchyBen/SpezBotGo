@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"spezbot/bot"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -26,7 +27,13 @@ func init() {
 			songs, vi, isURL, err := PlayStart(b, evt)
 			if err != nil {
 				return &discordgo.InteractionResponseData{
-					Content: "Error: " + err.Error(),
+					Embeds: []*discordgo.MessageEmbed{
+						{
+							Title:       "Error",
+							Description: strings.ToUpper(err.Error()[:1]) + err.Error()[1:],
+							Color:       0xff0000,
+						},
+					},
 				}
 			}
 			// If no song is playing play the song

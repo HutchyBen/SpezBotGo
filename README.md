@@ -22,4 +22,4 @@
 - [ ] Lavalink filters
 - [ ] Lavalink resuming (maybe)
 - [x] Pausing
-- [ ] Seek command
+- [x] Seek command

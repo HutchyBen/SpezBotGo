@@ -27,14 +27,11 @@ type VoiceInstance struct {
 	GID        string
 }
 
-func (b *Bot) CreateVoiceInstance(gID string, mID string, msgID string) error {
+func (b *Bot) CreateVoiceInstance(gID string, mID string, vcID string, msgID string) error {
 	var vi VoiceInstance
 	vi.GID = gID
-	state, err := b.Client.State.VoiceState(gID, mID)
-	if err != nil {
-		return fmt.Errorf("error getting voice state: %s", err)
-	}
-	err = b.Client.ChannelVoiceJoinManual(gID, state.ChannelID, false, false)
+
+	err := b.Client.ChannelVoiceJoinManual(gID, vcID, false, false)
 	if err != nil {
 		panic(err)
 	}
@@ -56,7 +53,10 @@ func (vi *VoiceInstance) GetSongs(search string) (*track.LoadResult, error) {
 	var result *track.LoadResult
 	var err error
 	if _, err = url.ParseRequestURI(search); err != nil {
-		result, err = vi.Bot.LLClient.LoadTracks(query.YouTube(search))
+		fmt.Println(search)
+		query := query.YouTube(search)
+		fmt.Println(query)
+		result, err = vi.Bot.LLClient.LoadTracks(query)
 	} else {
 		result, err = vi.Bot.LLClient.LoadTracks(query.Of((search)))
 	}
