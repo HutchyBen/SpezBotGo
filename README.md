@@ -20,7 +20,7 @@
 - /shuffle
 
 ## Todo
-- [ ] Shortcuts to playlists
+- [x] Shortcuts to playlists
 - [ ] Markov chain again
 - [x] Shuffle
 - [ ] Lavalink filters
