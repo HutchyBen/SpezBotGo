@@ -93,28 +93,36 @@ func init() {
 			}
 
 			songList := []string{}
-
-			qIdx := vi.QueueIndex + 1
-			songPlace := make([]int, len(vi.Queues))
+			songIndex := make([]int, len(vi.Queues))
+			qIdx := 1
 			i := 1
 			for {
 				if qIdx >= len(vi.Queues) {
 					qIdx = 0
 				}
+				if songIndex[qIdx] >= len(vi.Queues[qIdx].Tracks) {
+					depleted := 0
 
-				if songPlace[qIdx] >= len(vi.Queues[qIdx].Tracks) {
-					qIdx++
-
-					for i := 0; i < len(vi.Queues)-1; i++ {
-						if songPlace[i] < len(vi.Queues[i].Tracks) {
-							continue
+					for i := 0; i < len(vi.Queues); i++ {
+						if songIndex[qIdx] >= len(vi.Queues[qIdx].Tracks) {
+							depleted++
+							qIdx++
+							if qIdx >= len(vi.Queues) {
+								qIdx = 0
+							}
+						} else {
+							goto poo
 						}
 					}
-					break
+					fmt.Println(depleted)
+					if depleted == len(vi.Queues) {
+						break
+					}
 				}
 
-				songList = append(songList, fmt.Sprintf("%v. %v <@%v>\n", i, vi.Queues[qIdx].Tracks[songPlace[qIdx]].Info.Title, vi.Queues[qIdx].Member.User.ID))
-				songPlace[qIdx]++
+			poo:
+				songList = append(songList, fmt.Sprintf("%v. %v <@%v>\n", i, vi.Queues[qIdx].Tracks[songIndex[qIdx]].Info.Title, vi.Queues[qIdx].Member.User.ID))
+				songIndex[qIdx]++
 				qIdx++
 				i++
 			}
