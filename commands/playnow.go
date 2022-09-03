@@ -24,9 +24,15 @@ func init() {
 			},
 		},
 		Run: func(b *bot.Bot, evt *discordgo.InteractionCreate) *discordgo.InteractionResponseData {
+			err := b.Client.InteractionRespond(evt.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+			})
+			if err != nil {
+				fmt.Println(err)
+			}
 			songs, vi, isURL, err := PlayStart(b, evt)
 			if err != nil {
-				return &discordgo.InteractionResponseData{
+				b.Client.FollowupMessageCreate(evt.Interaction, false, &discordgo.WebhookParams{
 					Embeds: []*discordgo.MessageEmbed{
 						{
 							Title:       "Error",
@@ -34,47 +40,68 @@ func init() {
 							Color:       0xff0000,
 						},
 					},
-				}
+				})
+				return nil
 			}
-			// If no song is playing play the song
+			embedTitle := ""
+
+			if isURL && len(songs.Tracks) > 1 {
+				for i := 0; i <= len(songs.Tracks)-1; i++ {
+					vi.QueueSongNext(evt.Member, songs.Tracks[i])
+				}
+				embedTitle = fmt.Sprintf("Added %v songs to the queue and playing %v", len(songs.Tracks), songs.Tracks[0].Info.Title)
+			} else {
+				vi.QueueSongNext(evt.Member, songs.Tracks[0])
+				embedTitle = fmt.Sprintf("Playing %v", songs.Tracks[0].Info.Title)
+			}
+
 			if vi.NowPlaying == nil {
-				vi.Guild.PlayTrack(songs.Tracks[0])
+				err = vi.Guild.PlayTrack(*vi.Queues[0].Pop())
+				// Loop unitil song that isnt borked is found or until queue is empty
+				for err != nil {
+					if len(vi.Queues[0].Tracks) > 0 {
+						err = vi.Guild.PlayTrack(*vi.Queues[0].Pop())
+					} else {
+						b.Client.FollowupMessageCreate(evt.Interaction, false, &discordgo.WebhookParams{
+							Embeds: []*discordgo.MessageEmbed{
+								{
+									Title: "Error could not play any songs",
+									Color: 0xff0000,
+								},
+							},
+						})
+						return nil
+					}
+				}
 				vi.NowPlaying = &bot.NowPlaying{
 					Member: evt.Member,
 				}
-				return &discordgo.InteractionResponseData{
+				// should be empty
+				if len(vi.Queues[0].Tracks) == 0 {
+					vi.Queues = make([]bot.Queue, 0)
+				}
+				b.Client.FollowupMessageCreate(evt.Interaction, false, &discordgo.WebhookParams{
 					Embeds: []*discordgo.MessageEmbed{
 						{
-							Title: "Joined Voice Chat",
+							Title: "Starting voice session",
 							Color: 0x00ff00,
 						},
 					},
-				}
+				})
+				return nil
+			} else {
+				vi.Guild.Stop()
 			}
-			if isURL && len(songs.Tracks) > 1 {
-				for i := 0; i < len(songs.Tracks); i++ {
-					vi.QueueSongNext(evt.Member, songs.Tracks[i])
-				}
-				return &discordgo.InteractionResponseData{
-					Embeds: []*discordgo.MessageEmbed{
-						{
-							Title: fmt.Sprintf("Added %v songs to the queue", len(songs.Tracks)),
-							Color: 0x00ff00,
-						},
-					},
-				}
-			}
-			vi.QueueSongNext(evt.Member, songs.Tracks[0])
-			vi.Guild.Stop()
-			return &discordgo.InteractionResponseData{
+
+			b.Client.FollowupMessageCreate(evt.Interaction, false, &discordgo.WebhookParams{
 				Embeds: []*discordgo.MessageEmbed{
 					{
-						Title: fmt.Sprintf("Added %v to the queue", songs.Tracks[0].Info.Title),
+						Title: embedTitle,
 						Color: 0x00ff00,
 					},
 				},
-			}
-
+			})
+			return nil
 		},
 	})
 }
