@@ -91,6 +91,7 @@ func (vi *VoiceInstance) QueueSongNext(member *discordgo.Member, song track.Trac
 	vi.Queues = append(vi.Queues, Queue{
 		Member: member,
 		Tracks: []track.Track{song},
+		mu:     &sync.Mutex{},
 	})
 }
 
