@@ -21,7 +21,7 @@
 
 ## Todo
 - [x] Shortcuts to playlists
-- [ ] Markov chain again
+- [x] Markov chain again
 - [x] Shuffle
 - [ ] Lavalink filters
 - [ ] Lavalink resuming (maybe)
