@@ -137,8 +137,15 @@ func (vi *VoiceInstance) TrackEnd(evt event.TrackEnd) {
 	}
 
 	vi.NowPlaying.Member = vi.Queues[vi.QueueIndex].Member
-	vi.Guild.PlayTrack(*vi.Queues[vi.QueueIndex].Pop())
-
+	song := *vi.Queues[vi.QueueIndex].Pop()
+	err := vi.Guild.PlayTrack(song)
+	if err != nil {
+		vi.Bot.Client.ChannelMessageSendEmbed(vi.MsgChannel, &discordgo.MessageEmbed{
+			Title:       "Error",
+			Description: "Could not play song " + song.Info.Title,
+		})
+		vi.Guild.Stop()
+	}
 	if len(vi.Queues[vi.QueueIndex].Tracks) == 0 {
 		vi.Queues = append(vi.Queues[:vi.QueueIndex], vi.Queues[vi.QueueIndex+1:]...)
 	}
