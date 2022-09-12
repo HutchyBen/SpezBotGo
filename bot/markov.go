@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/mb-14/gomarkov"
 )
@@ -12,6 +13,7 @@ import (
 type Markov struct {
 	chain *gomarkov.Chain
 	file  *os.File
+	lock  *sync.Mutex // i think there is issue with way library does thibngs????
 }
 
 func NewMarkov(gID string) *Markov {
@@ -37,14 +39,18 @@ func NewMarkov(gID string) *Markov {
 }
 
 func (m *Markov) Add(text string) {
+	m.lock.Lock()
 	m.chain.Add(strings.Split(text, " "))
+	m.lock.Unlock()
 	m.file.WriteString(text + "\n")
 }
 
 func (m *Markov) Generate() string {
 	tokens := []string{gomarkov.StartToken}
 	for tokens[len(tokens)-1] != gomarkov.EndToken {
+		m.lock.Lock()
 		next, _ := m.chain.Generate(tokens[(len(tokens) - 1):])
+		m.lock.Unlock()
 		tokens = append(tokens, next)
 	}
 	return strings.Join(tokens[1:len(tokens)-1], " ")
