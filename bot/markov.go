@@ -19,6 +19,7 @@ type Markov struct {
 func NewMarkov(gID string) *Markov {
 	markov := &Markov{
 		chain: gomarkov.NewChain(1),
+		lock:  &sync.Mutex{},
 	}
 
 	file, err := os.OpenFile(fmt.Sprintf("models/%s", gID), os.O_RDWR|os.O_APPEND, 0666)
