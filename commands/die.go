@@ -21,7 +21,7 @@ func init() {
 					Embeds: []*discordgo.MessageEmbed{
 						{
 							Title:       "Error",
-							Description: "I'm already dead ",
+							Description: "I'm already dead SO SAD>>>",
 							Color:       0xff0000,
 						},
 					},
