@@ -47,7 +47,7 @@ func (b *Bot) CreateVoiceInstance(gID string, mID string, vcID string, msgID str
 }
 
 func (vi *VoiceInstance) Suicide() {
-	vi.Guild.Destroy()
+
 	delete(vi.Bot.VoiceInstances, vi.GID)
 }
 
