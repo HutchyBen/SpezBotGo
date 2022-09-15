@@ -126,3 +126,17 @@ func (b *Bot) WaterLinkEventHandler(evt interface{}) {
 
 	}
 }
+
+func (b *Bot) VoiceStateChange(s *discordgo.Session, evt *discordgo.VoiceStateUpdate) {
+	if evt.UserID == s.State.User.ID && evt.ChannelID == "" {
+		// bye...
+		vi, ok := b.VoiceInstances[evt.GuildID]
+		if !ok {
+			return
+		}
+
+		vi.Suicide()
+
+	}
+
+}
