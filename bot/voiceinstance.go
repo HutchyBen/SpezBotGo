@@ -37,12 +37,15 @@ func (b *Bot) CreateVoiceInstance(gID string, mID string, vcID string, msgID str
 		panic(err)
 	}
 	vi.Guild = b.LLConn.Guild(snowflake.MustParse(gID))
-
+	if vs := b.VoiceStati[gID]; vs != nil {
+		vi.Guild.UpdateVoice(b.Client.State.SessionID, vs.token, vs.endpoint)
+	}
 	vi.Queues = make([]Queue, 0)
-	b.VoiceInstances[gID] = &vi
 	vi.MsgChannel = msgID
 	vi.Bot = b
 	vi.NowPlaying = nil
+
+	b.VoiceInstances[gID] = &vi
 	return nil
 }
 
@@ -55,9 +58,7 @@ func (vi *VoiceInstance) GetSongs(search string) (*track.LoadResult, error) {
 	var result *track.LoadResult
 	var err error
 	if _, err = url.ParseRequestURI(search); err != nil {
-		fmt.Println(search)
 		query := query.YouTube(search)
-		fmt.Println(query)
 		result, err = vi.Bot.LLClient.LoadTracks(query)
 	} else {
 		result, err = vi.Bot.LLClient.LoadTracks(query.Of((search)))

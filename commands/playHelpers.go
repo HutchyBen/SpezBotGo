@@ -2,7 +2,6 @@ package commands
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"spezbot/bot"
 
@@ -17,7 +16,6 @@ func PlayStart(b *bot.Bot, evt *discordgo.InteractionCreate) (songs *track.LoadR
 		if err != nil {
 			return nil, nil, false, errors.New("you are not in a voice chat")
 		}
-		fmt.Println(state.ChannelID == "")
 		b.CreateVoiceInstance(evt.GuildID, evt.Member.User.ID, state.ChannelID, evt.ChannelID)
 		vi = b.VoiceInstances[evt.GuildID]
 	}

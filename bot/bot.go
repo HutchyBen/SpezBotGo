@@ -22,6 +22,12 @@ type Bot struct {
 	VoiceInstances map[string]*VoiceInstance
 	DB             *bbolt.DB
 	Markov         map[string]*Markov
+	VoiceStati     map[string]*VoiceStatus
+}
+
+type VoiceStatus struct {
+	token    string
+	endpoint string
 }
 
 func NewBot(configPath string) (*Bot, error) {
@@ -66,6 +72,7 @@ func NewBot(configPath string) (*Bot, error) {
 	bot.DB, err = bbolt.Open("spez.db", 0600, nil)
 
 	bot.Markov = make(map[string]*Markov)
+	bot.VoiceStati = make(map[string]*VoiceStatus)
 	bot.LoadMarkovChainsFromDir("models")
 	bot.Client.AddHandler(bot.MarkovMessage)
 	return &bot, err
@@ -101,11 +108,13 @@ func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) 
 }
 
 func (b *Bot) VoiceServerUpdate(s *discordgo.Session, evt *discordgo.VoiceServerUpdate) {
-	guild := b.LLConn.Guild(snowflake.MustParse(evt.GuildID))
-	err := guild.UpdateVoice(s.State.SessionID, evt.Token, evt.Endpoint)
-	if err != nil {
-		fmt.Println("Error updating voice server:", err)
+	b.VoiceStati[evt.GuildID] = &VoiceStatus{
+		token:    evt.Token,
+		endpoint: evt.Endpoint,
 	}
+
+	b.LLConn.Guild(snowflake.MustParse(evt.GuildID)).UpdateVoice(b.Client.State.SessionID, evt.Token, evt.Endpoint)
+
 }
 
 func (b *Bot) WaterLinkEventHandler(evt interface{}) {
