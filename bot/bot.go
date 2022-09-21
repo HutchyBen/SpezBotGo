@@ -46,7 +46,7 @@ func NewBot(configPath string) (*Bot, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	bot.Client.AddHandler(bot.VoiceStateChange)
 	// Load waterlink stuff
 	creds := waterlink.Credentials{
 		Authorization: bot.Config.LLPassword,
