@@ -46,7 +46,7 @@ func init() {
 			embedTitle := ""
 
 			if isURL && len(songs.Tracks) > 1 {
-				for i := 0; i <= len(songs.Tracks)-1; i++ {
+				for i := len(songs.Tracks) - 1; i >= 0; i-- {
 					vi.QueueSongNext(evt.Member, songs.Tracks[i])
 				}
 				embedTitle = fmt.Sprintf("Added %v songs to the queue", len(songs.Tracks))
