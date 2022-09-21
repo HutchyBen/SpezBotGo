@@ -97,6 +97,7 @@ func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) 
 	mk, ok := b.Markov[evt.GuildID]
 	if !ok {
 		b.Markov[evt.GuildID] = NewMarkov(evt.GuildID)
+		mk = b.Markov[evt.GuildID]
 	}
 	if strings.TrimSpace(evt.Content) != "" {
 		mk.Add(strings.TrimSpace(evt.Content))
