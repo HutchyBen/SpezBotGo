@@ -21,6 +21,11 @@ func init() {
 					Description: "vascular bypass",
 					Required:    true,
 				},
+				{
+					Type:        discordgo.ApplicationCommandOptionBoolean,
+					Name:        "schip",
+					Description: "flip (sorry) the current song cause its fucking naff",
+				},
 			},
 		},
 		Run: func(b *bot.Bot, evt *discordgo.InteractionCreate) *discordgo.InteractionResponseData {
@@ -47,20 +52,20 @@ func init() {
 
 			if isURL && len(songs.Tracks) > 1 {
 				for i := len(songs.Tracks) - 1; i >= 0; i-- {
-					vi.QueueSongNext(evt.Member, songs.Tracks[i])
+					vi.OverrideQueue.AddFront(songs.Tracks[i], evt.Member)
 				}
 				embedTitle = fmt.Sprintf("Added %v songs to the queue", len(songs.Tracks))
 			} else {
-				vi.QueueSongNext(evt.Member, songs.Tracks[0])
+				vi.OverrideQueue.AddFront(songs.Tracks[0], evt.Member)
 				embedTitle = fmt.Sprintf("Added %v to the queue", songs.Tracks[0].Info.Title)
 			}
 
 			if vi.NowPlaying == nil {
-				err = vi.Guild.PlayTrack(*vi.Queues[0].Pop())
+				err = vi.Guild.PlayTrack(*vi.Queues[0].Pop().Track)
 				// Loop unitil song that isnt borked is found or until queue is empty
 				for err != nil {
 					if len(vi.Queues[0].Tracks) > 0 {
-						err = vi.Guild.PlayTrack(*vi.Queues[0].Pop())
+						err = vi.Guild.PlayTrack(*vi.Queues[0].Pop().Track)
 					} else {
 						b.Client.FollowupMessageCreate(evt.Interaction, false, &discordgo.WebhookParams{
 							Embeds: []*discordgo.MessageEmbed{
@@ -89,6 +94,14 @@ func init() {
 					},
 				})
 				return nil
+			}
+
+			if len(evt.ApplicationCommandData().Options) >= 2 {
+				skip := evt.ApplicationCommandData().Options[1].BoolValue()
+				if skip {
+					vi.Guild.Stop()
+					return nil
+				}
 			}
 
 			b.Client.FollowupMessageCreate(evt.Interaction, false, &discordgo.WebhookParams{

@@ -19,9 +19,11 @@ type NowPlaying struct {
 }
 
 type VoiceInstance struct {
-	Guild      waterlink.Guild
-	Queues     []Queue
-	QueueIndex int
+	Guild         waterlink.Guild
+	Queues        []Queue
+	QueueIndex    int
+	OverrideQueue Queue // For playnext and playnows
+
 	Bot        *Bot
 	NowPlaying *NowPlaying
 	MsgChannel string
@@ -46,6 +48,11 @@ func (b *Bot) CreateVoiceInstance(gID string, mID string, vcID string, msgID str
 	vi.NowPlaying = nil
 
 	b.VoiceInstances[gID] = &vi
+	vi.OverrideQueue = Queue{
+		Member: nil,
+		Tracks: make([]UserTrack, 0),
+		mu:     &sync.Mutex{},
+	}
 	return nil
 }
 
@@ -69,31 +76,17 @@ func (vi *VoiceInstance) GetSongs(search string) (*track.LoadResult, error) {
 func (vi *VoiceInstance) QueueSong(member *discordgo.Member, song track.Track) {
 	for i := 0; i < len(vi.Queues); i++ {
 		if vi.Queues[i].Member.User.ID == member.User.ID {
-			vi.Queues[i].Add(song)
+			vi.Queues[i].Add(song, member)
 			return
 		}
 	}
 
 	vi.Queues = append(vi.Queues, Queue{
 		Member: member,
-		Tracks: []track.Track{song},
-		mu:     &sync.Mutex{},
-	})
-}
-
-func (vi *VoiceInstance) QueueSongNext(member *discordgo.Member, song track.Track) {
-	for i := 0; i < len(vi.Queues); i++ {
-		if vi.Queues[i].Member.User.ID == member.User.ID {
-			vi.Queues[i].AddFront(song)
-			vi.QueueIndex = i - 1
-			return
-		}
-	}
-
-	vi.Queues = append(vi.Queues, Queue{
-		Member: member,
-		Tracks: []track.Track{song},
-		mu:     &sync.Mutex{},
+		Tracks: []UserTrack{
+			{Member: member, Track: &song},
+		},
+		mu: &sync.Mutex{},
 	})
 }
 
@@ -127,6 +120,20 @@ func (vi *VoiceInstance) TrackEnd(evt event.TrackEnd) {
 		Color: 0xffff00,
 	}
 
+	if len(vi.OverrideQueue.Tracks) != 0 {
+		song := vi.OverrideQueue.Pop()
+		vi.NowPlaying.Member = song.Member
+		err := vi.Guild.PlayTrack(*song.Track)
+		if err != nil {
+			vi.Bot.Client.ChannelMessageSendEmbed(vi.MsgChannel, &discordgo.MessageEmbed{
+				Title:       "Error",
+				Description: "Could not play song " + song.Info.Title,
+			})
+			vi.Guild.Stop()
+		}
+		return
+	}
+
 	if len(vi.Queues) == 0 {
 		vi.Bot.Client.ChannelMessageSendEmbed(vi.MsgChannel, playbackFinishEmbed)
 		vi.Suicide()
@@ -140,7 +147,7 @@ func (vi *VoiceInstance) TrackEnd(evt event.TrackEnd) {
 
 	vi.NowPlaying.Member = vi.Queues[vi.QueueIndex].Member
 	song := *vi.Queues[vi.QueueIndex].Pop()
-	err := vi.Guild.PlayTrack(song)
+	err := vi.Guild.PlayTrack(*song.Track)
 	if err != nil {
 		vi.Bot.Client.ChannelMessageSendEmbed(vi.MsgChannel, &discordgo.MessageEmbed{
 			Title:       "Error",

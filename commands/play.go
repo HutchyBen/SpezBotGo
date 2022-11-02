@@ -56,11 +56,11 @@ func init() {
 			}
 
 			if vi.NowPlaying == nil {
-				err = vi.Guild.PlayTrack(*vi.Queues[0].Pop())
+				err = vi.Guild.PlayTrack(*vi.Queues[0].Pop().Track)
 				// Loop unitil song that isnt borked is found or until queue is empty
 				for err != nil {
 					if len(vi.Queues[0].Tracks) > 0 {
-						err = vi.Guild.PlayTrack(*vi.Queues[0].Pop())
+						err = vi.Guild.PlayTrack(*vi.Queues[0].Pop().Track)
 					} else {
 						b.Client.FollowupMessageCreate(evt.Interaction, false, &discordgo.WebhookParams{
 							Embeds: []*discordgo.MessageEmbed{

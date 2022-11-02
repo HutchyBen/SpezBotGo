@@ -8,25 +8,36 @@ import (
 	"github.com/lukasl-dev/waterlink/v2/track"
 )
 
+type UserTrack struct {
+	Member *discordgo.Member
+	*track.Track
+}
+
 type Queue struct {
 	Member *discordgo.Member
-	Tracks []track.Track
+	Tracks []UserTrack
 	mu     *sync.Mutex
 }
 
-func (q *Queue) Add(track track.Track) {
+func (q *Queue) Add(track track.Track, m *discordgo.Member) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
-	q.Tracks = append(q.Tracks, track)
+	q.Tracks = append(q.Tracks, UserTrack{
+		Member: m,
+		Track:  &track,
+	})
 }
 
-func (q *Queue) AddFront(song track.Track) {
+func (q *Queue) AddFront(track track.Track, m *discordgo.Member) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
-	q.Tracks = append([]track.Track{song}, q.Tracks...)
+	q.Tracks = append([]UserTrack{{
+		Member: m,
+		Track:  &track,
+	}}, q.Tracks...)
 }
 
-func (q *Queue) Pop() *track.Track {
+func (q *Queue) Pop() *UserTrack {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 	if len(q.Tracks) == 0 {
