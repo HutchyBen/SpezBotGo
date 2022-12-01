@@ -94,6 +94,11 @@ func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) 
 	if evt.Author.ID == s.State.User.ID {
 		return
 	}
+
+	// lol
+	if strings.Contains(evt.Content, "donkey-kong") || strings.Contains(evt.Content, "KuvDsT4sRzU") || strings.Contains(evt.Content, "donkeykong") {
+		s.ChannelMessageDelete(evt.ChannelID, evt.ID)
+	}
 	mk, ok := b.Markov[evt.GuildID]
 	if !ok {
 		b.Markov[evt.GuildID] = NewMarkov(evt.GuildID)
