@@ -96,7 +96,7 @@ func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) 
 	}
 
 	// lol
-	if strings.Contains(evt.Content, "donkey-kong") || strings.Contains(evt.Content, "KuvDsT4sRzU") || strings.Contains(evt.Content, "donkeykong") {
+	if strings.Contains(evt.Content, "donkey-kong") || strings.Contains(evt.Content, "KuvDsT4sRzU") || strings.Contains(evt.Content, "donkeykong") || strings.Contains(evt.Content, "donkey kong") {
 		s.ChannelMessageDelete(evt.ChannelID, evt.ID)
 	}
 	mk, ok := b.Markov[evt.GuildID]
