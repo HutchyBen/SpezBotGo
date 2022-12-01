@@ -94,9 +94,9 @@ func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) 
 	if evt.Author.ID == s.State.User.ID {
 		return
 	}
-
+	text := strings.ToLower(evt.Content)
 	// lol
-	if strings.Contains(evt.Content, "donkey-kong") || strings.Contains(evt.Content, "KuvDsT4sRzU") || strings.Contains(evt.Content, "donkeykong") || strings.Contains(evt.Content, "donkey kong") {
+	if strings.Contains(text, "donkey-kong") || strings.Contains(text, "KuvDsT4sRzU") || strings.Contains(text, "donkeykong") || strings.Contains(text, "donkey kong") {
 		err := s.ChannelMessageDelete(evt.ChannelID, evt.ID)
 		if err != nil {
 			fmt.Println("Cannot delete message: " + err.Error())
