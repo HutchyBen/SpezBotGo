@@ -94,6 +94,10 @@ func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) 
 	if evt.Author.ID == s.State.User.ID || evt.Author.Bot {
 		return
 	}
+	// Stop mudae commands hopefuilly
+	if strings.Contains(evt.Content, "$") && len(strings.Split(evt.Content, " ")) == 1 {
+		return
+	}
 
 	mk, ok := b.Markov[evt.GuildID]
 	if !ok {
