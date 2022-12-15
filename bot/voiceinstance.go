@@ -19,15 +19,15 @@ type NowPlaying struct {
 }
 
 type VoiceInstance struct {
-	Guild         waterlink.Guild
-	Queues        []Queue
-	QueueIndex    int
-	OverrideQueue Queue // For playnext and playnows
-
-	Bot        *Bot
-	NowPlaying *NowPlaying
-	MsgChannel string
-	GID        string
+	Guild            waterlink.Guild
+	Queues           []Queue
+	QueueIndex       int
+	OverrideQueue    Queue // For playnext and playnows
+	PlaybackPosition uint
+	Bot              *Bot
+	NowPlaying       *NowPlaying
+	MsgChannel       string
+	GID              string
 }
 
 func (b *Bot) CreateVoiceInstance(gID string, mID string, vcID string, msgID string) error {

@@ -91,17 +91,10 @@ func (b *Bot) LoadMarkovChainsFromDir(dir string) error {
 }
 
 func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) {
-	if evt.Author.ID == s.State.User.ID {
+	if evt.Author.ID == s.State.User.ID || evt.Author.Bot {
 		return
 	}
-	text := strings.ToLower(evt.Content)
-	// lol
-	if (strings.Contains(text, "donkey") && strings.Contains(text, "kong")) || strings.Contains(text, "KuvDsT4sRzU") {
-		err := s.ChannelMessageDelete(evt.ChannelID, evt.ID)
-		if err != nil {
-			fmt.Println("Cannot delete message: " + err.Error())
-		}
-	}
+
 	mk, ok := b.Markov[evt.GuildID]
 	if !ok {
 		b.Markov[evt.GuildID] = NewMarkov(evt.GuildID)
@@ -142,7 +135,14 @@ func (b *Bot) WaterLinkEventHandler(evt interface{}) {
 		}
 		vi.TrackStart(e)
 
+	case event.PlayerUpdate:
+		vi, ok := b.VoiceInstances[e.GuildID.String()]
+		if !ok {
+			return
+		}
+		vi.PlaybackPosition = e.State.Position
 	}
+
 }
 
 func (b *Bot) VoiceStateChange(s *discordgo.Session, evt *discordgo.VoiceStateUpdate) {
