@@ -91,11 +91,7 @@ func (b *Bot) LoadMarkovChainsFromDir(dir string) error {
 }
 
 func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) {
-	if evt.Author.ID == s.State.User.ID || evt.Author.Bot {
-		return
-	}
-	// Stop mudae commands hopefuilly
-	if strings.Contains(evt.Content, "$") && len(strings.Split(evt.Content, " ")) == 1 {
+	if evt.Author.ID == s.State.User.ID {
 		return
 	}
 
@@ -104,7 +100,7 @@ func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) 
 		b.Markov[evt.GuildID] = NewMarkov(evt.GuildID)
 		mk = b.Markov[evt.GuildID]
 	}
-	if strings.TrimSpace(evt.Content) != "" {
+	if strings.TrimSpace(evt.Content) != "" && (strings.Contains(evt.Content, "$") && len(strings.Split(evt.Content, " ")) == 1) && !evt.Author.Bot {
 		mk.Add(strings.TrimSpace(evt.Content))
 	}
 
