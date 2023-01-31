@@ -61,7 +61,9 @@ func init() {
 				for err != nil {
 					if len(vi.Queues[0].Tracks) > 0 {
 						err = vi.Guild.PlayTrack(*vi.Queues[0].Pop().Track)
+
 					} else {
+						fmt.Println("sad", err)
 						b.Client.FollowupMessageCreate(evt.Interaction, false, &discordgo.WebhookParams{
 							Embeds: []*discordgo.MessageEmbed{
 								{

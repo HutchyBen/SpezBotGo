@@ -75,6 +75,7 @@ func NewBot(configPath string) (*Bot, error) {
 	bot.VoiceStati = make(map[string]*VoiceStatus)
 	bot.LoadMarkovChainsFromDir("models")
 	bot.Client.AddHandler(bot.MarkovMessage)
+	bot.Client.AddHandler(bot.Ox)
 	return &bot, err
 }
 
@@ -88,6 +89,10 @@ func (b *Bot) LoadMarkovChainsFromDir(dir string) error {
 		b.Markov[strings.Split(f.Name(), ".")[0]] = mk
 	}
 	return nil
+}
+
+func (b *Bot) Ox(s *discordgo.Session, evt *discordgo.MessageCreate) {
+	b.Client.MessageReactionAdd(evt.ChannelID, evt.ID, "🐂")
 }
 
 func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) {
