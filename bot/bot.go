@@ -92,7 +92,7 @@ func (b *Bot) LoadMarkovChainsFromDir(dir string) error {
 }
 
 func (b *Bot) Ox(s *discordgo.Session, evt *discordgo.MessageCreate) {
-	b.Client.MessageReactionAdd(evt.ChannelID, evt.ID, "🐂")
+	b.Client.MessageReactionAdd(evt.ChannelID, evt.ID, ":Hey:1037477383638360185")
 }
 
 func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) {
