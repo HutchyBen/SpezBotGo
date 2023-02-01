@@ -75,7 +75,8 @@ func NewBot(configPath string) (*Bot, error) {
 	bot.VoiceStati = make(map[string]*VoiceStatus)
 	bot.LoadMarkovChainsFromDir("models")
 	bot.Client.AddHandler(bot.MarkovMessage)
-	bot.Client.AddHandler(bot.Ox)
+	// Levi will leave probably 
+	//bot.Client.AddHandler(bot.Ox)
 	return &bot, err
 }
 
