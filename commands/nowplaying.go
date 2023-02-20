@@ -11,6 +11,9 @@ import (
 )
 
 func DescProgress(now uint, total uint) string {
+	if total <= 0 || now > total || now < 0 {
+		return "Cannot get progress"
+	}
 	nowTime := time.Duration(now) * time.Millisecond
 	totalTime := time.Duration(total) * time.Millisecond
 	var prog = float64(nowTime) / float64(totalTime)
