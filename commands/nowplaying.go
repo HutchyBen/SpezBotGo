@@ -11,12 +11,11 @@ import (
 )
 
 func DescProgress(now uint, total uint) string {
-	if now > total {
+	if now > total || total < 0 { // dont question it
 		return "Cannot get progress"
 	}
 	nowTime := time.Duration(now) * time.Millisecond
 	totalTime := time.Duration(total) * time.Millisecond
-	fmt.Printf("now: %f, total: %f", float64(nowTime), float64(totalTime))
 	var prog = float64(nowTime) / float64(totalTime)
 	var emoPos = math.Round(10 * prog)
 	str := "▬▬▬▬▬▬▬▬▬▬▬"
