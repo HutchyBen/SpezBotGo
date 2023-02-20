@@ -10,8 +10,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func DescProgress(now uint, total uint) string {
-	if total <= 0 || now > total || now < 0 {
+func DescProgress(now int, total uint) string {
+	if total <= 0 || now <= 0 || now > int(total) {
 		return "Cannot get progress"
 	}
 	nowTime := time.Duration(now) * time.Millisecond
@@ -48,7 +48,7 @@ func init() {
 
 			embed := &discordgo.MessageEmbed{
 				Title:       vc.NowPlaying.Track.Title,
-				Description: DescProgress(uint(vc.PlaybackPosition), vc.NowPlaying.Track.Length),
+				Description: DescProgress(vc.PlaybackPosition, vc.NowPlaying.Track.Length),
 				Author: &discordgo.MessageEmbedAuthor{
 					Name:    vc.NowPlaying.Member.User.Username,
 					IconURL: vc.NowPlaying.Member.AvatarURL("1024"),
