@@ -17,7 +17,7 @@ func DescProgress(now uint, total uint) string {
 
 	var prog = float64(nowTime) / float64(totalTime)
 	var emoPos = math.Round(10 * prog)
-	if emoPos > 0 || emoPos < 10 {
+	if emoPos < 0 || emoPos > 10 {
 		return "Cannot get progress"
 	}
 	str := "▬▬▬▬▬▬▬▬▬▬▬"
