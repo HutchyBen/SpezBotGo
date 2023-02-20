@@ -16,10 +16,10 @@ func DescProgress(now uint, total uint) string {
 	}
 	nowTime := time.Duration(now) * time.Millisecond
 	totalTime := time.Duration(total) * time.Millisecond
+	fmt.Printf("now: %f, total: %f", float64(nowTime), float64(totalTime))
 	var prog = float64(nowTime) / float64(totalTime)
 	var emoPos = math.Round(10 * prog)
 	str := "▬▬▬▬▬▬▬▬▬▬▬"
-	fmt.Println(emoPos)
 	tmp := []rune(str)
 	tmp[int(emoPos)] = '🔘'
 	str = string(tmp)
