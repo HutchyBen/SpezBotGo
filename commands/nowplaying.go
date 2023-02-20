@@ -10,8 +10,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func DescProgress(now int, total uint) string {
-	if total <= 0 || now <= 0 || now > int(total) {
+func DescProgress(now uint, total uint) string {
+	if total <= 0 || now <= 0 || now > total {
 		return "Cannot get progress"
 	}
 	nowTime := time.Duration(now) * time.Millisecond
