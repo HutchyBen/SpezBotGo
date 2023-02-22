@@ -6,6 +6,8 @@ import (
 	"spezbot/commands"
 )
 
+var die = make(chan bool)
+
 func main() {
 	bot, err := bot.NewBot("config.json")
 	if err != nil {
@@ -15,6 +17,6 @@ func main() {
 	bot.CH.Register(bot.Client)
 	bot.Client.UpdateGameStatus(0, "Clash of Clans")
 	fmt.Println("Bot is running with name " + bot.Client.State.User.Username)
-	select {}
+	bot.Wait()
 
 }

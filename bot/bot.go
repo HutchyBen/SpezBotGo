@@ -23,6 +23,7 @@ type Bot struct {
 	DB             *bbolt.DB
 	Markov         map[string]*Markov
 	VoiceStati     map[string]*VoiceStatus
+	Die            chan (bool)
 }
 
 type VoiceStatus struct {
@@ -75,7 +76,13 @@ func NewBot(configPath string) (*Bot, error) {
 	bot.VoiceStati = make(map[string]*VoiceStatus)
 	bot.LoadMarkovChainsFromDir("models")
 	bot.Client.AddHandler(bot.MarkovMessage)
+
+	bot.Die = make(chan bool)
 	return &bot, err
+}
+
+func (b *Bot) Wait() {
+	<-b.Die
 }
 
 func (b *Bot) LoadMarkovChainsFromDir(dir string) error {
