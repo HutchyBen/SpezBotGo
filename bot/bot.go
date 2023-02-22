@@ -146,15 +146,31 @@ func (b *Bot) WaterLinkEventHandler(evt interface{}) {
 }
 
 func (b *Bot) VoiceStateChange(s *discordgo.Session, evt *discordgo.VoiceStateUpdate) {
+	vi, ok := b.VoiceInstances[evt.GuildID]
+	if !ok {
+		return
+	}
 	if evt.UserID == s.State.User.ID && evt.ChannelID == "" {
 		// bye...
-		vi, ok := b.VoiceInstances[evt.GuildID]
-		if !ok {
-			return
-		}
-
 		vi.Suicide()
 	}
 	// if spez is the only exister. Pause.
-	channel, err := s.Chan
+	g, err := s.State.Guild(evt.GuildID)
+	if err != nil {
+		return
+	}
+
+	for _, vs := range g.VoiceStates {
+		if vs.ChannelID == evt.ChannelID && vs.UserID != s.State.User.ID {
+			vi.Guild.SetPaused(false)
+			return
+		}
+	}
+
+	vi.Guild.SetPaused(true)
+	s.ChannelMessageSendEmbed(vi.MsgChannel, &discordgo.MessageEmbed{
+		Title: "Paused due to everyone fucking off",
+		Color: 0xffff00,
+	})
+
 }
