@@ -19,8 +19,8 @@ func init() {
 			Options: []*discordgo.ApplicationCommandOption{
 				{
 					Type:        discordgo.ApplicationCommandOptionInteger,
-					Name:        "LOUDYNESS",
-					Description: "HOW FUFFING LOUD ",
+					Name:        "loundyness",
+					Description: "HOW FUFFING LOUD",
 					Required:    true,
 					MinValue:    getFloatPTR(0),
 					MaxValue:    1000,
