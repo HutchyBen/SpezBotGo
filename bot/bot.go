@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"os"
@@ -38,17 +39,17 @@ func NewBot(configPath string) (*Bot, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Load discord client
+
 	bot.Client, err = discordgo.New("Bot " + bot.Config.DToken)
 	if err != nil {
 		return nil, err
 	}
+
 	err = bot.Client.Open()
 	if err != nil {
 		return nil, err
 	}
-	bot.Client.AddHandler(bot.VoiceStateChange)
-	// Load waterlink stuff
+
 	creds := waterlink.Credentials{
 		Authorization: bot.Config.LLPassword,
 		UserID:        snowflake.MustParse(bot.Client.State.User.ID),
@@ -57,27 +58,27 @@ func NewBot(configPath string) (*Bot, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	bot.LLConn, err = waterlink.Open("ws://localhost:2333", creds, waterlink.ConnectionOptions{
 		EventHandler: waterlink.EventHandlerFunc(bot.WaterLinkEventHandler),
 	})
 	if err != nil {
 		return nil, err
 	}
-	bot.Client.AddHandler(bot.VoiceServerUpdate)
 
 	bot.CH = NewCH()
-	bot.Client.AddHandler(bot.HandleInteraction)
-
 	bot.VoiceInstances = make(map[string]*VoiceInstance)
-
 	bot.DB, err = bbolt.Open("spez.db", 0600, nil)
-
-	bot.Markov = make(map[string]*Markov)
 	bot.VoiceStati = make(map[string]*VoiceStatus)
-	bot.LoadMarkovChainsFromDir("models")
-	bot.Client.AddHandler(bot.MarkovMessage)
-
+	bot.Markov = make(map[string]*Markov)
 	bot.Die = make(chan bool)
+
+	bot.LoadMarkovChainsFromDir("models")
+
+	bot.Client.AddHandler(bot.VoiceServerUpdate)
+	bot.Client.AddHandler(bot.HandleInteraction)
+	bot.Client.AddHandler(bot.MarkovMessage)
+	bot.Client.AddHandler(bot.VoiceStateChange)
 	return &bot, err
 }
 
@@ -152,6 +153,20 @@ func (b *Bot) WaterLinkEventHandler(evt interface{}) {
 
 }
 
+func (b *Bot) GetVoiceState(guildID string) (*discordgo.VoiceState, error) {
+	guild, err := b.Client.State.Guild(guildID)
+	if err != nil {
+		return nil, err
+	}
+	for _, vs := range guild.VoiceStates {
+		if vs.UserID == b.Client.State.User.ID {
+			return vs, nil
+		}
+	}
+
+	return nil, errors.New("no voice state found")
+}
+
 func (b *Bot) VoiceStateChange(s *discordgo.Session, evt *discordgo.VoiceStateUpdate) {
 	vi, ok := b.VoiceInstances[evt.GuildID]
 	if !ok {
@@ -166,10 +181,12 @@ func (b *Bot) VoiceStateChange(s *discordgo.Session, evt *discordgo.VoiceStateUp
 	if err != nil {
 		return
 	}
-
+	spezVC, err := b.GetVoiceState(evt.GuildID)
+	if err != nil {
+		return
+	}
 	for _, vs := range g.VoiceStates {
-		if vs.ChannelID == evt.ChannelID && vs.UserID != s.State.User.ID {
-			vi.Guild.SetPaused(false)
+		if vs.UserID != s.State.User.ID && spezVC.ChannelID == vs.ChannelID {
 			return
 		}
 	}
