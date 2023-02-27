@@ -6,18 +6,23 @@
 - Uses slash commands
 - Has a fair queue system
 - Better written than C# version
+- Spams your server with randomly generated text
 
 ## Commands
-- /play
-- /playnext
-- /playnow
-- /skip
-- /queue
-- /echo
-- /pause
-- /resume
-- /seek
-- /shuffle
+- `/echo`
+- `/forcestop`
+- `/kill`
+- `/nowplaying`
+- `/pause`
+- `/play`
+- `/playlist`
+- `/playnext`
+- `/queue`
+- `/resume`
+- `/seek`
+- `/shuffle`
+- `/skip`
+- `/volume`
 
 ## Todo
 - [x] Shortcuts to playlists
