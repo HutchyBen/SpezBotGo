@@ -18,7 +18,7 @@ type Markov struct {
 
 func NewMarkov(gID string) *Markov {
 	markov := &Markov{
-		chain: gomarkov.NewChain(2),
+		chain: gomarkov.NewChain(1),
 		lock:  &sync.Mutex{},
 	}
 

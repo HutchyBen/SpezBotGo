@@ -1,6 +1,8 @@
 package bot
 
 import (
+	"math/rand"
+
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -44,6 +46,15 @@ func (c *CommandHandler) Register(s *discordgo.Session) {
 func (b *Bot) HandleInteraction(s *discordgo.Session, evt *discordgo.InteractionCreate) {
 	switch evt.Type {
 	case discordgo.InteractionApplicationCommand:
+		if rand.Intn(15) < 2 {
+			s.InteractionRespond(evt.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "nah cba",
+				},
+			})
+			return
+		}
 		cmd := b.CH.Commands[evt.ApplicationCommandData().Name]
 		if cmd == nil {
 
