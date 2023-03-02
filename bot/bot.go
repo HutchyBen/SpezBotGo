@@ -187,6 +187,8 @@ func (b *Bot) VoiceStateChange(s *discordgo.Session, evt *discordgo.VoiceStateUp
 	}
 	for _, vs := range g.VoiceStates {
 		if vs.UserID != s.State.User.ID && spezVC.ChannelID == vs.ChannelID {
+			vi.Guild.SetPaused(false)
+
 			return
 		}
 	}
