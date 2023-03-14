@@ -103,6 +103,10 @@ func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) 
 		return
 	}
 
+	if evt.Author.ID == "947332449854193696" { // I HATE MUDAE!!
+		return
+	}
+
 	mk, ok := b.Markov[evt.GuildID]
 	if !ok {
 		b.Markov[evt.GuildID] = NewMarkov(evt.GuildID)
