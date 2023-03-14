@@ -105,6 +105,7 @@ func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) 
 
 	if strings.Contains(strings.ToLower(evt.Content), "e621") {
 		s.ChannelMessageSend(evt.ChannelID, "Kill yourself.")
+		s.ChannelMessageDelete(evt.ChannelID, evt.Message.ID)
 		return
 	}
 
