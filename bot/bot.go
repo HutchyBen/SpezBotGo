@@ -103,6 +103,11 @@ func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) 
 		return
 	}
 
+	if strings.Contains(strings.ToLower(evt.Content), "e621") {
+		s.ChannelMessageSend(evt.ChannelID, "Kill yourself.")
+		return
+	}
+
 	mk, ok := b.Markov[evt.GuildID]
 	if !ok {
 		b.Markov[evt.GuildID] = NewMarkov(evt.GuildID)
