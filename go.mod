@@ -9,8 +9,6 @@ require (
 	go.etcd.io/bbolt v1.3.7
 )
 
-require github.com/stretchr/testify v1.8.1 // indirect
-
 require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/mb-14/gomarkov v0.0.0-20210216094942-a5b484cc0243

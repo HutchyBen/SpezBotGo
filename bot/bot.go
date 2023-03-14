@@ -103,7 +103,7 @@ func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) 
 		return
 	}
 
-	if evt.Author.ID == "947332449854193696" { // I HATE MUDAE!!
+	if  { // I HATE MUDAE!!
 		return
 	}
 
@@ -112,11 +112,11 @@ func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) 
 		b.Markov[evt.GuildID] = NewMarkov(evt.GuildID)
 		mk = b.Markov[evt.GuildID]
 	}
-	if strings.TrimSpace(evt.Content) != "" && (strings.Contains(evt.Content, "$") && len(strings.Split(evt.Content, " ")) == 1) && !evt.Author.Bot {
+	if strings.TrimSpace(evt.Content) != "" && evt.Author.ID != "947332449854193696" {
 		mk.Add(strings.TrimSpace(evt.Content))
 	}
 
-	if rand.Intn(8) == 1 || strings.Contains(evt.Content, "spez") || strings.Contains(evt.Content, fmt.Sprintf("<@%s>", s.State.User.ID)) {
+	if rand.Intn(8) == 1 || strings.Contains(strings.ToLower(evt.Content), "spez") || strings.Contains(evt.Content, fmt.Sprintf("<@%s>", s.State.User.ID)) {
 		s.ChannelMessageSend(evt.ChannelID, mk.Generate())
 	}
 }
