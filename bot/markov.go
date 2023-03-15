@@ -3,10 +3,12 @@ package bot
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"strings"
 	"sync"
 
+	"github.com/bwmarrin/discordgo"
 	"github.com/mb-14/gomarkov"
 )
 
@@ -55,4 +57,35 @@ func (m *Markov) Generate() string {
 		tokens = append(tokens, next)
 	}
 	return strings.Join(tokens[1:len(tokens)-1], " ")
+}
+
+func (b *Bot) LoadMarkovChainsFromDir(dir string) error {
+	fs, err := os.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+	for _, f := range fs {
+		mk := NewMarkov(f.Name())
+		b.Markov[strings.Split(f.Name(), ".")[0]] = mk
+	}
+	return nil
+}
+
+func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) {
+	if evt.Author.ID == s.State.User.ID {
+		return
+	}
+
+	mk, ok := b.Markov[evt.GuildID]
+	if !ok {
+		b.Markov[evt.GuildID] = NewMarkov(evt.GuildID)
+		mk = b.Markov[evt.GuildID]
+	}
+	if strings.TrimSpace(evt.Content) != "" && evt.Author.ID != "947332449854193696" {
+		mk.Add(strings.TrimSpace(evt.Content))
+	}
+
+	if rand.Intn(8) == 1 || strings.Contains(strings.ToLower(evt.Content), "spez") || strings.Contains(evt.Content, fmt.Sprintf("<@%s>", s.State.User.ID)) {
+		s.ChannelMessageSend(evt.ChannelID, mk.Generate())
+	}
 }

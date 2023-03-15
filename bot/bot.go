@@ -2,10 +2,6 @@ package bot
 
 import (
 	"errors"
-	"fmt"
-	"math/rand"
-	"os"
-	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gompus/snowflake"
@@ -75,52 +71,21 @@ func NewBot(configPath string) (*Bot, error) {
 
 	bot.LoadMarkovChainsFromDir("models")
 
-	bot.Client.AddHandler(bot.VoiceServerUpdate)
-	bot.Client.AddHandler(bot.HandleInteraction)
-	bot.Client.AddHandler(bot.MarkovMessage)
-	bot.Client.AddHandler(bot.VoiceStateChange)
+	bot.InitHandlers()
 	return &bot, err
 }
 
+func (b *Bot) InitHandlers() {
+	b.Client.AddHandler(b.VoiceServerUpdate)
+	b.Client.AddHandler(b.HandleInteraction)
+	b.Client.AddHandler(b.MarkovMessage)
+	b.Client.AddHandler(b.VoiceStateChange)
+	b.Client.AddHandler(b.E621Censor)
+}
+
 func (b *Bot) Wait() {
+	b.InitDumbStuff()
 	<-b.Die
-}
-
-func (b *Bot) LoadMarkovChainsFromDir(dir string) error {
-	fs, err := os.ReadDir(dir)
-	if err != nil {
-		return err
-	}
-	for _, f := range fs {
-		mk := NewMarkov(f.Name())
-		b.Markov[strings.Split(f.Name(), ".")[0]] = mk
-	}
-	return nil
-}
-
-func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) {
-	if evt.Author.ID == s.State.User.ID {
-		return
-	}
-
-	if strings.Contains(strings.ToLower(evt.Content), "e621") {
-		s.ChannelMessageSend(evt.ChannelID, "Kill yourself.")
-		s.ChannelMessageDelete(evt.ChannelID, evt.Message.ID)
-		return
-	}
-
-	mk, ok := b.Markov[evt.GuildID]
-	if !ok {
-		b.Markov[evt.GuildID] = NewMarkov(evt.GuildID)
-		mk = b.Markov[evt.GuildID]
-	}
-	if strings.TrimSpace(evt.Content) != "" && evt.Author.ID != "947332449854193696" {
-		mk.Add(strings.TrimSpace(evt.Content))
-	}
-
-	if rand.Intn(8) == 1 || strings.Contains(strings.ToLower(evt.Content), "spez") || strings.Contains(evt.Content, fmt.Sprintf("<@%s>", s.State.User.ID)) {
-		s.ChannelMessageSend(evt.ChannelID, mk.Generate())
-	}
 }
 
 func (b *Bot) VoiceServerUpdate(s *discordgo.Session, evt *discordgo.VoiceServerUpdate) {
@@ -194,7 +159,6 @@ func (b *Bot) VoiceStateChange(s *discordgo.Session, evt *discordgo.VoiceStateUp
 	for _, vs := range g.VoiceStates {
 		if vs.UserID != s.State.User.ID && spezVC.ChannelID == vs.ChannelID {
 			vi.Guild.SetPaused(false)
-
 			return
 		}
 	}
