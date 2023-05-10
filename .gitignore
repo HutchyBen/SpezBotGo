@@ -2,3 +2,6 @@ config.json
 spezbot
 *.db
 models/*
+Lavalink.jar
+start.sh
+application.yml

@@ -24,7 +24,8 @@ func NewMarkov(gID string) *Markov {
 		lock:  &sync.Mutex{},
 	}
 
-	file, err := os.OpenFile(fmt.Sprintf("models/%s", gID), os.O_RDWR|os.O_APPEND, 0666)
+	file, err := os.OpenFile(fmt.Sprintf("models/%s", gID), os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
+	fmt.Println(err)
 	if err != nil {
 		return markov
 	}
@@ -81,11 +82,11 @@ func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) 
 		b.Markov[evt.GuildID] = NewMarkov(evt.GuildID)
 		mk = b.Markov[evt.GuildID]
 	}
+	if rand.Intn(8) == 1 || strings.Contains(strings.ToLower(evt.Content), "spez") || strings.Contains(evt.Content, fmt.Sprintf("<@%s>", s.State.User.ID)) {
+		s.ChannelMessageSend(evt.ChannelID, mk.Generate())
+	}
 	if strings.TrimSpace(evt.Content) != "" && evt.Author.ID != "947332449854193696" {
 		mk.Add(strings.TrimSpace(evt.Content))
 	}
 
-	if rand.Intn(8) == 1 || strings.Contains(strings.ToLower(evt.Content), "spez") || strings.Contains(evt.Content, fmt.Sprintf("<@%s>", s.State.User.ID)) {
-		s.ChannelMessageSend(evt.ChannelID, mk.Generate())
-	}
 }
