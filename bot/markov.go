@@ -85,7 +85,7 @@ func (b *Bot) MarkovMessage(s *discordgo.Session, evt *discordgo.MessageCreate) 
 	if rand.Intn(8) == 1 || strings.Contains(strings.ToLower(evt.Content), "spez") || strings.Contains(evt.Content, fmt.Sprintf("<@%s>", s.State.User.ID)) {
 		s.ChannelMessageSend(evt.ChannelID, mk.Generate())
 	}
-	if strings.TrimSpace(evt.Content) != "" && evt.Author.ID != "947332449854193696" && strings.Contains(strings.ToLower(evt.Content) != "spez") {
+	if strings.TrimSpace(evt.Content) != "" && evt.Author.ID != "947332449854193696" && strings.ToLower(evt.Content) != "spez") {
 		mk.Add(strings.TrimSpace(evt.Content))
 	}
 
